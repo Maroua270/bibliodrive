@@ -20,9 +20,9 @@
 
 .navbar {
     position: fixed;
-    top: 60px; /* below banner */
+    top: 60px; 
     left: 50%;
-    transform: translateX(-45%); /* slightly right */
+    transform: translateX(-45%); 
     
     background-color: #2c3e50;
     padding: 10px 20px;
@@ -128,7 +128,7 @@
 
 <div class="page-offset"></div>
 <?php include_once "login.php"; ?>
-<!-- RGPD mini text bottom-right -->
+
 <div class="rgpd-info">
   Cookies nécessaires
   <div class="rgpd-tooltip">

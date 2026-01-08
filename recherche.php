@@ -36,9 +36,12 @@ $auteurRecherche = isset($_GET['author']) ? trim($_GET['author']) : '';
 $resultats = [];
 $messageResultat = '';
 
+// Si l'utilisateur a tapé quelque chose, on lance la recherche
 if ($auteurRecherche !== '') {
+  // On découpe la recherche en "mots" (ex: "Victor Hugo" -> ["Victor","Hugo"])
     $tokens = preg_split('/\s+/', $auteurRecherche, -1, PREG_SPLIT_NO_EMPTY);
 
+    // On prépare une requête dynamique: chaque mot doit apparaître dans nom OU prénom
     $whereParts = [];
     $params = [];
     foreach ($tokens as $t) {
@@ -48,6 +51,7 @@ if ($auteurRecherche !== '') {
     }
 
     
+    // Si aucun mot, on force une condition fausse
     if (empty($whereParts)) {
         $whereSql = "1=0";
     } else {
@@ -55,6 +59,7 @@ if ($auteurRecherche !== '') {
         $whereSql = implode(' AND ', $whereParts);
     }
 
+    // Requête: récupérer les livres + auteur correspondant à la recherche
     $sql = "SELECT l.nolivre, l.titre, a.nom, a.prenom
             FROM livre l
             JOIN auteur a ON l.noauteur = a.noauteur
@@ -65,6 +70,7 @@ if ($auteurRecherche !== '') {
     $stmt->execute($params);
     $resultats = $stmt->fetchAll();
 
+    // Message affiché à l'utilisateur (nombre de résultats)
     if (empty($resultats)) {
         $messageResultat = "Aucun livre trouvé pour l'auteur « <strong>" . htmlspecialchars($auteurRecherche) . "</strong> ».";
     } else {
@@ -74,13 +80,14 @@ if ($auteurRecherche !== '') {
 ?>
 
     
+<!-- Barre de navigation (avec recherche + liens) -->
     <?php require "navbar.php"; ?>
 
 <div class="container-fluid mt-3">
   <div class="row">
     <div class="col-lg-7 col-md-8">
 
-      <!-- RESULTS START HERE -->
+      
       <?php if ($auteurRecherche !== ''): ?>
         <div class="alert alert-info mb-4">
           <?php echo $messageResultat; ?>
@@ -105,8 +112,7 @@ if ($auteurRecherche !== '') {
           Entrez le nom d'un auteur pour voir la liste de ses livres disponibles.
         </div>
       <?php endif; ?>
-      <!-- RESULTS END -->
-
+      
     </div>
   </div>
 </div>

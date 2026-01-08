@@ -1,5 +1,5 @@
 <?php
-// login.php (UI PANEL ONLY)
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -7,12 +7,13 @@ if (session_status() === PHP_SESSION_NONE) {
 $loginError = $_SESSION['login_error'] ?? '';
 unset($_SESSION['login_error']);
 
-// current page so user returns here after login
+
 $redirect = $_SERVER['REQUEST_URI'] ?? 'accueil.php';
 ?>
 
 <div class="login-panel">
     <?php if (!isset($_SESSION['mel'])): ?>
+        <!-- Cas 1: utilisateur NON connecté => afficher le formulaire -->
         <h5 class="text-center mb-3">Se connecter</h5>
 
         <?php if ($loginError): ?>
@@ -36,6 +37,7 @@ $redirect = $_SERVER['REQUEST_URI'] ?? 'accueil.php';
         </form>
 
     <?php else: ?>
+        <!-- Cas 2: utilisateur connecté => afficher les infos et le bouton déconnexion -->
         <h5 class="text-center mb-3">Mon compte</h5>
         <p><strong>Nom :</strong> <?= htmlspecialchars($_SESSION['nom'] ?? '') ?></p>
         <p><strong>Prénom :</strong> <?= htmlspecialchars($_SESSION['prenom'] ?? '') ?></p>

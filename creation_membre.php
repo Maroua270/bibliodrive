@@ -2,15 +2,17 @@
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once "connexion.php";
 
+// Vérifie que l'utilisateur est admin
 $profil = strtolower((string)($_SESSION['profil'] ?? ''));
 if ($profil !== 'admin' && $profil !== 'administrateur') {
     echo '<div class="alert alert-danger">Accès refusé.</div>';
     return;
 }
 
-$errors = [];
-$ok = false;
+$errors = []; // Tableau d'erreurs à afficher   
+$ok = false; // Indique si la création a réussi
 
+// Récupération + nettoyage des champs
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'creation_membre') {
     $mel = trim($_POST['mel'] ?? '');
     $motdepasse = trim($_POST['motdepasse'] ?? '');
@@ -20,10 +22,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $ville = trim($_POST['ville'] ?? '');
     $codepostal = trim($_POST['codepostal'] ?? '');
 
+
+    // Vérification des champs obligatoires
     if ($mel === '' || $motdepasse === '' || $nom === '' || $prenom === '') {
         $errors[] = "Mel, mot de passe, nom, prénom sont obligatoires.";
     }
 
+
+    // Vérifier que le mel n'existe pas déjà
     if (!$errors) {
         // mel unique ?
         $stmt = $connexion->prepare("SELECT 1 FROM utilisateur WHERE mel = ? LIMIT 1");
@@ -34,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 
     if (!$errors) {
+        $hash = password_hash($motdepasse, PASSWORD_DEFAULT);
         $sql = "INSERT INTO utilisateur (mel, motdepasse, nom, prenom, adresse, ville, codepostal, profil)
                 VALUES (?, ?, ?, ?, ?, ?, ?, 'client')";
         $stmt = $connexion->prepare($sql);

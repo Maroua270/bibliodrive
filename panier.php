@@ -1,7 +1,7 @@
 <?php
 session_start();
 require "connexion.php";
-// navbar will be included inside the body so it centers like on accueil.php
+
 
 
 
@@ -11,7 +11,7 @@ if (!isset($_SESSION['panier']) || !is_array($_SESSION['panier'])) {
 
 $mel = $_SESSION['mel'] ?? null;
 
-// count emprunts en cours (DB)
+
 $empruntsEnCours = 0;
 if ($mel) {
     $stmt = $connexion->prepare("SELECT COUNT(*) FROM emprunter WHERE mel = ? AND dateretour IS NULL");
@@ -22,7 +22,7 @@ if ($mel) {
 $cartCount = count($_SESSION['panier']);
 $reste = max(0, 5 - ($empruntsEnCours + $cartCount));
 
-// fetch books in cart
+
 $livres = [];
 $ids = array_map('intval', array_keys($_SESSION['panier']));
 $ids = array_values(array_filter($ids, fn($v) => $v > 0));

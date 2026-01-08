@@ -1,17 +1,18 @@
 <?php
 session_start();
-require "connexion.php"; // creates $connexion (PDO)
+require "connexion.php"; 
 
 $isLoggedIn = isset($_SESSION['mel']);
 
-// 1) GET ID
+
 $nolivre = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($nolivre <= 0) {
     header('Location: recherche.php');
     exit;
 }
 
-// 2) FETCH BOOK
+
+// Récupérer les infos du livre + son auteur
 $sql = "SELECT l.nolivre, l.titre, l.isbn13, l.detail, l.photo, a.nom, a.prenom
         FROM livre l
         JOIN auteur a ON l.noauteur = a.noauteur
@@ -25,26 +26,29 @@ if (!$livre) {
     exit;
 }
 
-// 3) AVAILABILITY
+
+// Vérifier si le livre est actuellement emprunté (dateretour NULL = pas rendu)
 $sql = "SELECT 1 FROM emprunter WHERE nolivre = ? AND dateretour IS NULL LIMIT 1";
 $stmt = $connexion->prepare($sql);
 $stmt->execute([$nolivre]);
 $isDisponible = !$stmt->fetchColumn();
 $disponibilite = $isDisponible ? "Disponible" : "Indisponible";
-// 3bis) Already in cart?
+
+
+// Vérifier si le livre est déjà dans le panier (stocké en session)
 $inCart = false;
 if (isset($_SESSION['panier']) && is_array($_SESSION['panier'])) {
     $inCart = isset($_SESSION['panier'][(string)$nolivre]);
 }
 
-// If it's in cart, treat it as not available for THIS user
+// Si le livre est dans le panier, on le considère indisponible (pour empêcher de re-cliquer)
 if ($inCart) {
     $isDisponible = false;
     $disponibilite = "Indisponible";
 }
 
 
-// 4) WARNING (if not logged in)
+// Message d'avertissement si pas connecté
 $warning = "";
 if (!$isLoggedIn) {
     $warning = "Pour pouvoir réserver vous devez posséder un compte et vous identifier.";
@@ -66,8 +70,8 @@ if (!$isLoggedIn) {
 
 <?php require_once "navbar.php"; ?>
 <?php
-require_once "flash.php";
 
+require "flash.php";
 $success = flash_get('flash_success');
 $warning = flash_get('flash_warning');
 
@@ -100,7 +104,7 @@ if ($success): ?>
                         <?= nl2br(htmlspecialchars($livre['detail'])) ?>
                     </div>
 
-                   <!-- DISPONIBILITÉ + MESSAGE/BOUTON -->
+                   
 <div class="d-flex align-items-center gap-3 mt-3">
 
     <span class="fw-semibold <?= $isDisponible ? 'text-success' : 'text-danger' ?>">

@@ -1,9 +1,5 @@
 <?php
-// Fragment réutilisable pour afficher soit le formulaire de connexion,
-// soit les infos de l'utilisateur (à inclure dans acceuil.php)
-// NB: ne démarre pas la session ici — `acceuil.php` doit appeler session_start()
 
-// Si utilisateur connecté, afficher les infos (fragment HTML)
 if (!empty($_SESSION['mel'])) {
     $nom = htmlspecialchars($_SESSION['nom'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $prenom = htmlspecialchars($_SESSION['prenom'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -28,7 +24,7 @@ if (!empty($_SESSION['mel'])) {
     return;
 }
 
-// Sinon afficher le formulaire de connexion (le JS l'enverra en AJAX)
+
 ?>
 <div id="session-widget" class="login-widget">
   <h2>Se connecter</h2>
@@ -45,4 +41,4 @@ if (!empty($_SESSION['mel'])) {
 </div>
 
 <?php
-// Fin du fragment
+

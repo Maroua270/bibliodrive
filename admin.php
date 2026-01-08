@@ -2,7 +2,8 @@
 session_start();
 require_once "connexion.php";
 
-// ✅ protection
+
+// Protection
 if (!isset($_SESSION['mel'])) {
    
     header("Location: accueil.php");
@@ -15,7 +16,7 @@ if ($profil !== 'admin' && $profil !== 'administrateur') {
     exit;
 }
 
-$page = $_GET['page'] ?? ''; // 'ajout' | 'membre' | ''
+$page = $_GET['page'] ?? ''; 
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -36,10 +37,7 @@ $page = $_GET['page'] ?? ''; // 'ajout' | 'membre' | ''
         La bibliothèque de Moulinsart est fermée au public jusqu'à nouvel ordre.
         Mais vous pouvez réserver et retirer vos livres via <strong>Biblio Drive</strong>.
     </p>
-
-  
-
-    <!-- ✅ Message -->
+    
     <div class="mt-4">
         <h1 class="display-5">Administration</h1>
         <?php if ($page === ''): ?>
@@ -47,13 +45,13 @@ $page = $_GET['page'] ?? ''; // 'ajout' | 'membre' | ''
         <?php endif; ?>
     </div>
 
-    <!-- ✅ Barre admin (remplace la search bar) -->
+    
     <div class="bg-dark p-3 rounded-3 d-inline-flex gap-3 align-items-center" style="min-width: 520px;">
         <a href="admin.php?page=ajout" class="btn btn-light fw-semibold">Ajouter un livre</a>
         <a href="admin.php?page=membre" class="btn btn-light fw-semibold">Créer un membre</a>
     </div>
 
-    <!-- ✅ Contenu central (change, tout le reste reste fixe) -->
+    
     <div class="mt-4" style="max-width: 900px;">
         <?php
         if ($page === 'ajout') {
@@ -65,8 +63,11 @@ $page = $_GET['page'] ?? ''; // 'ajout' | 'membre' | ''
     </div>
 </div>
 
-<!-- ✅ Panneau compte fixe (comme accueil) -->
+
 <?php require "login.php"; ?>
 
 </body>
 </html>
+  
+
+    

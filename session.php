@@ -3,9 +3,11 @@ session_start();
 var_dump($_SESSION['profil'] ?? 'NO_PROFIL_IN_SESSION');
 exit;
 
-// Déconnexion via POST ou GET (compatible avec anciens liens)
+
 if (($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout'])) || (isset($_GET['logout']))) {
+    // Vide toutes les données de la session
     $_SESSION = [];
+    // Supprime le cookie de session si les cookies sont utilisés
     if (ini_get('session.use_cookies')) {
         $params = session_get_cookie_params();
         setcookie(session_name(), '', time() - 42000,
@@ -18,7 +20,7 @@ if (($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['logout'])) || (isset
     exit;
 }
 
-// Si l'utilisateur est connecté (variables créées par seconnecter.php), afficher le profil
+// Sécurisation des données avant affichage (protection XSS)
 if (!empty($_SESSION['mel'])) {
     $nom = htmlspecialchars($_SESSION['nom'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $prenom = htmlspecialchars($_SESSION['prenom'] ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -43,6 +45,7 @@ if (!empty($_SESSION['mel'])) {
     </head>
     <body>
       <div class="profile">
+        <!-- Affichage des informations utilisateur -->
         <h1>Profil</h1>
         <div class="field"><span class="label">Nom :</span> <?php echo $nom; ?></div>
         <div class="field"><span class="label">Prénom :</span> <?php echo $prenom; ?></div>
@@ -51,6 +54,7 @@ if (!empty($_SESSION['mel'])) {
         <div class="field"><span class="label">Ville :</span> <?php echo $ville; ?></div>
         <div class="field"><span class="label">Code postal :</span> <?php echo $codepostal; ?></div>
 
+        <!-- Formulaire de déconnexion -->
         <form method="post" style="margin-top:14px">
           <button type="submit" name="logout" class="logout">Se déconnecter</button>
         </form>
@@ -61,7 +65,7 @@ if (!empty($_SESSION['mel'])) {
     exit;
 }
 
-// Si non connecté affichage du formulaire de connexion (envoie vers seconnecter.php)
+
 $err = '';
 ?>
 <!doctype html>
@@ -76,6 +80,8 @@ $err = '';
   <div class="login-panel">
     <h1>Se connecter</h1>
     <?php if ($err): ?><p class ="error"><?php echo htmlspecialchars($err); ?></p><?php endif; ?>
+      
+      <!-- Formulaire de connexion -->
     <form method="post" action="seconnecter.php">
       <label for="identifiant">Identifiant (email)</label>
       <input id="identifiant" name="identifiant" type="email" required>

@@ -24,6 +24,8 @@
 
 <?php
 require_once "navbar.php";
+
+// Connexion à la base de données avec PDO
 try {
   $dns = 'mysql:host=localhost;dbname=bibliodrive;charset=utf8mb4';
   $utilisateur = 'root';
@@ -36,7 +38,7 @@ try {
   die("Connexion à MySQL impossible : " . $e->getMessage());
 }
 
-// Load books BEFORE HTML
+
 $sql = "SELECT titre, photo, anneeparution 
         FROM livre 
         WHERE photo IS NOT NULL AND photo <> ''
@@ -44,7 +46,9 @@ $sql = "SELECT titre, photo, anneeparution
         LIMIT 3";
 $stmt = $connexion->query($sql);
 $livres = $stmt->fetchAll();
-// If no images found in DB, fallback to first images from covers/
+
+
+// Si aucun livre avec photo n'est trouvé, on prend des images du dossier /covers comme solution de secours
 if (count($livres) === 0) {
   $files = array_values(array_filter(scandir(__DIR__ . '/covers'), function($f) {
     return preg_match('/\.(jpe?g|png|gif)$/i', $f);

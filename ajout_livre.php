@@ -1,15 +1,16 @@
 <?php
-// admin.php inclut déjà session + connexion, mais on sécurise
+
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_once "connexion.php";
 
+// Vérification des droits: seul un admin peut voir/ utiliser ce formulaire
 $profil = strtolower((string)($_SESSION['profil'] ?? ''));
 if ($profil !== 'admin' && $profil !== 'administrateur') {
     echo '<div class="alert alert-danger">Accès refusé.</div>';
     return;
 }
 
-// liste auteurs
+
 $auteurs = $connexion->query("SELECT noauteur, nom, prenom FROM auteur ORDER BY nom, prenom")->fetchAll();
 
 $errors = [];

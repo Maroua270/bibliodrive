@@ -1,12 +1,14 @@
 <?php
-// annuler-valider.php
+
 session_start();
 require "connexion.php";
 
+// S'assurer que le panier existe bien dans la session
 if (!isset($_SESSION['panier']) || !is_array($_SESSION['panier'])) {
     $_SESSION['panier'] = [];
 }
 
+// 2) Vérifier que l'utilisateur est connecté
 if (!isset($_SESSION['mel'])) {
     header("Location: accueil.php");
     exit;
@@ -14,7 +16,7 @@ if (!isset($_SESSION['mel'])) {
 
 $mel = $_SESSION['mel'];
 
-// ANNULER one item
+
 if (isset($_GET['annuler'])) {
     $id = (int)$_GET['annuler'];
     unset($_SESSION['panier'][(string)$id]);
@@ -23,7 +25,7 @@ if (isset($_GET['annuler'])) {
     exit;
 }
 
-// VALIDER panier => insert into emprunter then clear cart
+
 if (isset($_POST['valider'])) {
     $ids = array_map('intval', array_keys($_SESSION['panier']));
     $ids = array_values(array_filter($ids, fn($v) => $v > 0));
@@ -34,7 +36,7 @@ if (isset($_POST['valider'])) {
         exit;
     }
 
-    // count current ongoing loans
+    // Compter les emprunts en cours
     $stmt = $connexion->prepare("SELECT COUNT(*) FROM emprunter WHERE mel = ? AND dateretour IS NULL");
     $stmt->execute([$mel]);
     $enCours = (int)$stmt->fetchColumn();
@@ -45,17 +47,20 @@ if (isset($_POST['valider'])) {
         exit;
     }
 
-    // insert each book if still available
+    
     $connexion->beginTransaction();
     try {
+        // Vérifier si un livre est déjà emprunté
         $check = $connexion->prepare("SELECT 1 FROM emprunter WHERE nolivre = ? AND dateretour IS NULL LIMIT 1");
+
+        // Enregistrer un emprunt
         $insert = $connexion->prepare("INSERT INTO emprunter (mel, nolivre, dateemprunt, dateretour) VALUES (?, ?, NOW(), NULL)");
 
         foreach ($ids as $nolivre) {
             $check->execute([$nolivre]);
             $indispo = (bool)$check->fetchColumn();
             if ($indispo) {
-                continue; // skip unavailable
+                continue; 
             }
             $insert->execute([$mel, $nolivre]);
         }
@@ -68,6 +73,7 @@ if (isset($_POST['valider'])) {
         $_SESSION['flash_warning'] = "Erreur validation panier : " . $e->getMessage();
     }
 
+    // Retour sur la page panier
     header("Location: panier.php");
     exit;
 }

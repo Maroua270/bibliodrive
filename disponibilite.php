@@ -4,14 +4,11 @@ require "connexion.php";
 $nolivre = (int)($_GET['id'] ?? 0);
 
 
+// Démarre la session si elle n'est pas déjà démarrée (pour savoir si l'utilisateur est connecté)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// $connexion must exist (PDO) and $nolivre must exist
-// Example in livre.php before include:
-// require_once "connexion.php";
-// $nolivre = (int)$_GET['id'];
 
 $sql = "
     SELECT dateretour
@@ -24,6 +21,11 @@ $stmt = $connexion->prepare($sql);
 $stmt->execute([$nolivre]);
 $emprunt = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
+// Disponible si:
+// - aucun emprunt trouvé
+// OU
+// - le dernier emprunt a une dateretour (donc le livre a été rendu)
 $isDisponible = !($emprunt && $emprunt['dateretour'] === null);
 $disponibilite = $isDisponible ? "Disponible" : "Indisponible";
 ?>
