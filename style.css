@@ -51,9 +51,6 @@ a{ text-decoration:none; color: inherit; }
 .disponible{ color: var(--success); font-weight:700; }
 .indisponible{ color: var(--danger); font-weight:700; }
 
-/* =========================
-   Layout helpers
-========================= */
 .flex-row{ display:flex; gap: 18px; }
 .sidebar-col{
   display:flex;
@@ -62,14 +59,11 @@ a{ text-decoration:none; color: inherit; }
   margin-top: 40px;
 }
 
-/* Reserve space for fixed login panel */
+
 .page-with-login{
-  padding-right: 420px; /* login width + breathing space */
+  padding-right: 420px; 
 }
 
-/* =========================
-   Login panel (fixed)
-========================= */
 .login-panel{
   width: 340px;
   max-width: 340px;
@@ -87,7 +81,7 @@ a{ text-decoration:none; color: inherit; }
 .login-panel .form-label{ font-size: 14px; }
 
 /* =========================
-   Carousel (last books)
+   Carousel
 ========================= */
 .last-books{
   max-width: 900px;
@@ -100,7 +94,6 @@ a{ text-decoration:none; color: inherit; }
   position: relative;
 }
 
-/* hide radios */
 .css-carousel input{ display:none; }
 
 .slides{
@@ -113,7 +106,7 @@ a{ text-decoration:none; color: inherit; }
   box-shadow: var(--shadow-md);
 }
 
-/* stacked slides, only one visible */
+
 .slide{
   position:absolute;
   inset:0;
@@ -153,7 +146,7 @@ a{ text-decoration:none; color: inherit; }
 .slide-title{ font-weight:600; }
 .slide-year{ opacity:.75; }
 
-/* show slide based on radio */
+
 #s1:checked ~ .slides .slide:nth-child(1),
 #s2:checked ~ .slides .slide:nth-child(2),
 #s3:checked ~ .slides .slide:nth-child(3){
@@ -184,9 +177,7 @@ a{ text-decoration:none; color: inherit; }
 
 .results-under-search{ margin-top: 20px; }
 
-/* =========================
-   RGPD cookie info (bottom-right)
-========================= */
+
 .rgpd-info{
   position: fixed;
   bottom: 10px;
@@ -220,10 +211,7 @@ a{ text-decoration:none; color: inherit; }
   opacity: 1;
 }
 
-/* =========================
-   Panier styles (IMPORTANT: scoped)
-   Add body class "page-panier" only on panier.php
-========================= */
+
 body.page-panier{
   background: var(--bg);
 }
@@ -265,17 +253,15 @@ body.page-panier .checkout-btn{
   font-size: 16px;
 }
 
-/* =========================
-   Responsive
-========================= */
+
 @media (max-width:900px){
   .flex-row{ flex-direction:column; }
   .slide-card img{ height:280px; }
 
-  /* On mobile: don't reserve space for fixed panel */
+  
   .page-with-login{ padding-right: 0; }
 
-  /* Make login panel not fixed on small screens */
+ 
   .login-panel{
     position: static;
     width: 100%;
