@@ -1,76 +1,379 @@
 
-/* CONTAINER OF SLIDESHOW + LOGIN */
-.flex-row {
-  display: flex;
-  justify-content: center; /* keeps slideshow centered */
-  align-items: flex-start;
-  gap: 60px; /* space between slideshow and login */
-  margin-top: 20px;
+:root{
+  --bg: #f5f7fb;
+  --text: #111827;
+  --muted: #6b7280;
+
+  --card: #ffffff;
+  --border: #d1d5db;
+
+  --radius: 12px;
+  --radius-lg: 18px;
+
+  --shadow-sm: 0 6px 18px rgba(2,6,23,0.10);
+  --shadow-md: 0 10px 30px rgba(0,0,0,.08);
+
+  --success: #198754;
+  --danger: #dc3545;
+  --primary: #0d6efd;
 }
 
-/* SLIDESHOW BOX */
-.slideshow-wrapper {
+
+html, body { height: 100%; }
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+a{ text-decoration:none; color: inherit; }
+
+
+.navbar{
+  max-width: 980px;
+  margin: 0 auto 18px auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+
+.titre-section{
+  color: #2c8b2c;
+  font-weight: 700;
   text-align: center;
+  margin-bottom: 15px;
 }
 
-/* CSS-only slideshow */
-.slideshow-container {
-  width: 260px; /* same size as screenshot */
-  height: 430px;
+.liste-livres a{ color: #2d6cdf; }
+.liste-livres a:hover{ text-decoration: underline; }
+
+.disponible{ color: var(--success); font-weight:700; }
+.indisponible{ color: var(--danger); font-weight:700; }
+
+/* =========================
+   Layout helpers
+========================= */
+.flex-row{ display:flex; gap: 18px; }
+.sidebar-col{
+  display:flex;
+  justify-content:flex-end;
+  align-items:flex-start;
+  margin-top: 40px;
+}
+
+/* Reserve space for fixed login panel */
+.page-with-login{
+  padding-right: 420px; /* login width + breathing space */
+}
+
+/* =========================
+   Login panel (fixed)
+========================= */
+.login-panel{
+  width: 340px;
+  max-width: 340px;
+  border: 2px solid #444;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: none;
+  position: fixed;
+  right: 20px;
+  top: 130px;
+  z-index: 1000;
+  padding: 18px;
+}
+
+.login-panel .form-label{ font-size: 14px; }
+
+/* =========================
+   Carousel (last books)
+========================= */
+.last-books{
+  max-width: 900px;
+  margin: 30px auto;
+}
+
+.css-carousel{
+  width: 420px;
+  margin: 0 auto;
   position: relative;
+}
+
+/* hide radios */
+.css-carousel input{ display:none; }
+
+.slides{
+  position: relative;
+  width: 100%;
+  height: 520px;
   overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-md);
+}
+
+/* stacked slides, only one visible */
+.slide{
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  opacity:0;
+  pointer-events:none;
+  transition: opacity .35s ease;
+}
+
+.slide-card{
+  width: 260px;
+  border-radius: var(--radius-lg);
+  overflow:hidden;
+  background: var(--card);
+  box-shadow: 0 10px 25px rgba(0,0,0,.10);
+  position:relative;
+}
+
+.slide-card img{
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+  display:block;
+}
+
+.slide-caption{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  padding:10px 12px;
+  background:rgba(0,0,0,.55);
+  color:#fff;
+  text-align:center;
+}
+
+.slide-title{ font-weight:600; }
+.slide-year{ opacity:.75; }
+
+/* show slide based on radio */
+#s1:checked ~ .slides .slide:nth-child(1),
+#s2:checked ~ .slides .slide:nth-child(2),
+#s3:checked ~ .slides .slide:nth-child(3){
+  opacity:1;
+  pointer-events:auto;
+}
+
+.dots{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top: 12px;
+}
+
+.dot{
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background:#cfcfcf;
+  cursor:pointer;
+}
+
+#s1:checked ~ .dots label:nth-child(1),
+#s2:checked ~ .dots label:nth-child(2),
+#s3:checked ~ .dots label:nth-child(3){
+  background: var(--primary);
+}
+
+.results-under-search{ margin-top: 20px; }
+
+/* =========================
+   RGPD cookie info (bottom-right)
+========================= */
+.rgpd-info{
+  position: fixed;
+  bottom: 10px;
+  right: 12px;
+  font-size: 12px;
+  color: #555;
+  background: rgba(255,255,255,.95);
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  cursor: default;
+  z-index: 99999;
+}
+
+.rgpd-tooltip{
+  position: absolute;
+  right: 0;
+  bottom: 34px;
+  width: 300px;
+  background: #222;
+  color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+
+.rgpd-info:hover .rgpd-tooltip{
+  opacity: 1;
+}
+
+/* =========================
+   Panier styles (IMPORTANT: scoped)
+   Add body class "page-panier" only on panier.php
+========================= */
+body.page-panier{
+  background: var(--bg);
+}
+
+body.page-panier .container{
+  display:flex;
+  padding: 30px;
+  gap: 30px;
+  max-width: 1200px;
   margin: auto;
 }
 
-.slide {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  opacity: 0;
-  animation: fadeSlide 9s infinite;
+body.page-panier .cart-section{
+  flex: 2;
+  background: var(--card);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
 }
 
-.slide img {
-  width: 100%;
-  height: auto;
+body.page-panier .checkout-section{
+  flex: 1;
+  background: #d3f2d3;
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
 }
 
-.caption {
-  font-size: 13px;
-  text-align: center;
-  margin-top: 5px;
-  color: #333;
+body.page-panier .checkout-btn{
+  display:block;
+  width:100%;
+  padding: 15px;
+  background-color: #2e7d32;
+  color: white;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
 }
 
-@keyframes fadeSlide {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  33% { opacity: 1; }
-  43% { opacity: 0; }
-  100% { opacity: 0; }
+/* =========================
+   Responsive
+========================= */
+@media (max-width:900px){
+  .flex-row{ flex-direction:column; }
+  .slide-card img{ height:280px; }
+
+  /* On mobile: don't reserve space for fixed panel */
+  .page-with-login{ padding-right: 0; }
+
+  /* Make login panel not fixed on small screens */
+  .login-panel{
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    margin: 18px auto;
+  }
+
+  .css-carousel{ width: min(420px, 92vw); }
+  .slides{ height: 440px; }
 }
 
-.slide:nth-child(1) { animation-delay: 0s; }
-.slide:nth-child(2) { animation-delay: 3s; }
-.slide:nth-child(3) { animation-delay: 6s; }
-
-/* LOGIN BOX (Right side) */
-.login-box {
-  border: 1px solid black;
-  padding: 15px 20px;
-  width: 180px;
-  text-align: center;
-  background: #fff;
+.top-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 14px;
+    border-bottom: 1px solid #ddd;
+    z-index: 1000;
 }
 
-.login-box input {
-  width: 90%;
-  margin: 6px 0;
+.navbar {
+    position: fixed;
+    top: 60px; 
+    left: 50%;
+    transform: translateX(-45%); 
+    
+    background-color: #2c3e50;
+    padding: 10px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    
+    display: flex;
+    justify-content: center;
+    width: 70%;
+    max-width: 900px;
+    z-index: 999;
+    border-radius: 8px;
 }
 
-.login-box button {
-  margin-top: 10px;
+.navbar .search-form {
+    display: flex;
+    gap: 8px;
+    width: 100%;
 }
 
+.navbar .search-form input {
+    flex-grow: 1;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
 
+.navbar .search-form button,
+.navbar .search-form a {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.navbar .search-form button {
+    background-color: #28a745;
+}
+
+.navbar .search-form .icon-button {
+    width: 40px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar .search-form .icon-button svg {
+    width: 18px;
+    height: 18px;
+}
+
+.navbar .search-form a {
+    background-color: #6c757d;
+}
+
+.page-offset {
+    height: 150px;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        width: 95%;
+        transform: translateX(-50%);
+    }
+
+    .navbar .search-form {
+        flex-direction: column;
+    }
+}
 

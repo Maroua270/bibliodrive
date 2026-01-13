@@ -1,4 +1,7 @@
-     <!DOCTYPE html>
+ <?php
+ session_start();
+  ?>
+ <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -12,93 +15,60 @@
     
     <div class="container-fluid mt-5">
         <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <p class="text-muted">La bibliothèque de Moulinsart est fermée au public jusqu'à nouvel ordre. Mais il vous est possible de réserver et retirer vos livres via notre service Biblio Drive !</p>
+            <div class="col-12">
+                
+              <?php
+              require_once "navbar.php";
+              
+              // Connexion à la base de données avec PDO
+              try {
+                $dns = 'mysql:host=localhost;dbname=bibliodrive;charset=utf8mb4';
+                $utilisateur = 'root';
+                $motDePasse = '';
+                $connexion = new PDO($dns, $utilisateur, $motDePasse, [
+                  PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                  PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                ]);
+              } catch (Exception $e) {
+                die("Connexion à MySQL impossible : " . $e->getMessage());
+              }
+              
+              // Récupération des 3 derniers livres avec photo
+              $sql = "SELECT titre, photo, anneeparution 
+                      FROM livre 
+                      WHERE photo IS NOT NULL AND photo <> ''
+                      ORDER BY dateajout DESC 
+                      LIMIT 3";
+              $stmt = $connexion->query($sql);
+              $livres = $stmt->fetchAll();
+              
+              
+              // Si aucun livre avec photo n'est trouvé, on prend des images du dossier /covers comme solution de secours
+              if (count($livres) === 0) {
+                $files = array_values(array_filter(scandir(__DIR__ . '/covers'), function($f) {
+                  return preg_match('/\.(jpe?g|png|gif)$/i', $f);
+                }));
+                $files = array_slice($files, 0, 3);
+                foreach ($files as $f) {
+                  $livres[] = ['titre' => pathinfo($f, PATHINFO_FILENAME), 'photo' => $f, 'anneeparution' => null];
+                }
+              }
+              ?>
+              
+              
+              
+              <h2 class="text-center mb-4">Dernières acquisitions</h2>
+              <?php include "slideshow.php"; ?>
+              
+              </body>
+                   </html>
+
                 
           
+
+
               
 
 
-<?php
-require_once "navbar.php";
-try {
-  $dns = 'mysql:host=localhost;dbname=bibliodrive;charset=utf8mb4';
-  $utilisateur = 'root';
-  $motDePasse = '';
-  $connexion = new PDO($dns, $utilisateur, $motDePasse, [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-  ]);
-} catch (Exception $e) {
-  die("Connexion à MySQL impossible : " . $e->getMessage());
-}
-
-// Load books BEFORE HTML
-$sql = "SELECT titre, photo, anneeparution 
-        FROM livre 
-        WHERE photo IS NOT NULL AND photo <> ''
-        ORDER BY dateajout DESC 
-        LIMIT 3";
-$stmt = $connexion->query($sql);
-$livres = $stmt->fetchAll();
-?>
 
 
-
-  <h3 style="text-align:center;">Dernières acquisitions</h3>
-
-<!-- FLEX ROW: slideshow (center) + login (right) -->
-<div class="flex-row">
-
-  <!-- LEFT: Slideshow section -->
-  <div class="slideshow-wrapper">
-    <div class="slideshow-container">
-
-      <?php foreach ($livres as $livre): ?>
-        <div class="slide">
-          <img src="covers/<?= htmlspecialchars($livre['photo']) ?>">
-        </div>
-      <?php endforeach; ?>
-
-    </div>
-
-    <div class="caption">(Carrousel)</div>
-  </div>
-
-  <!-- RIGHT: Login form -->
-  <div class="login-box">
-      <p><strong>Se connecter</strong></p>
-
-      <form action="action_page.php" method="post">
-        <label>Identifiant</label><br>
-        <input type="text" name="uname" required><br>
-
-        <label>Mot de passe</label><br>
-        <input type="password" name="psw" required><br>
-
-        <button type="submit">Connexion</button>
-      </form>
-  </div>
-
-</div>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</body>
-     </html>
